@@ -65,15 +65,20 @@ public class DockerContainer implements IContainerLaunch {
     LOG.info("Container launch userName:" + userName);
     String appId = conf.get(XLearningConfiguration.XLEARNING_APP_ID);
     String homePath = envs.get("HADOOP_HDFS_HOME");
-    String logDir = envs.get("KUAISHOU_YARN_LOG_DIR");
     String mount = " -v " + path + ":" + "/work";
     mount += " -v " + homePath + ":" + homePath;
     mount += " -v " + "/home/yarn/software/hadoop:/home/yarn/software/hadoop";
-    mount += " -v " + logDir + ":" + logDir;
     String[] localDirs = conf.getStrings(YarnConfiguration.NM_LOCAL_DIRS);
     if (localDirs.length > 0) {
       for (String perPath : localDirs) {
         String basePath = perPath + "/usercache/" + userName + "/appcache/" + appId;
+        mount = mount + " -v " + basePath + ":" + basePath;
+      }
+    }
+    String[] logsDirs = conf.getStrings(YarnConfiguration.NM_LOG_DIRS);
+    if (localDirs.length > 0) {
+      for (String perPath : logsDirs) {
+        String basePath = perPath + "/" + appId;
         mount = mount + " -v " + basePath + ":" + basePath;
       }
     }
